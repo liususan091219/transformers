@@ -227,7 +227,7 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
     best_run = BestRun(best_trial.trial_id, best_trial.last_result["objective"], best_trial.config)
     if _tb_writer is not None:
         trainer.add_callback(_tb_writer)
-    return best_run
+    return best_run, best_trial
 
 
 def rewrite_logs(d):

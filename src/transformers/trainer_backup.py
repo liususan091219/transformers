@@ -418,7 +418,7 @@ class Trainer:
 
         return DataLoader(
             self.train_dataset,
-            batch_size=self.args.train_batch_size,
+            batch_size= self.args.train_batch_size,
             sampler=train_sampler,
             collate_fn=self.data_collator,
             drop_last=self.args.dataloader_drop_last,
@@ -456,7 +456,7 @@ class Trainer:
         return DataLoader(
             eval_dataset,
             sampler=eval_sampler,
-            batch_size=self.args.eval_batch_size,
+            batch_size= self.args.eval_batch_size,
             collate_fn=self.data_collator,
             drop_last=self.args.dataloader_drop_last,
             num_workers=self.args.dataloader_num_workers,
@@ -483,7 +483,7 @@ class Trainer:
         return DataLoader(
             test_dataset,
             sampler=test_sampler,
-            batch_size=self.args.eval_batch_size,
+            batch_size= self.args.eval_batch_size,
             collate_fn=self.data_collator,
             drop_last=self.args.dataloader_drop_last,
         )
@@ -755,6 +755,7 @@ class Trainer:
             self.control = self.callback_handler.on_epoch_begin(self.args, self.state, self.control)
 
             for step, inputs in enumerate(epoch_iterator):
+                import pdb; pdb.set_trace()
 
                 # Skip past any already trained steps if resuming training
                 if steps_trained_in_current_epoch > 0:
@@ -801,7 +802,8 @@ class Trainer:
                     self.state.global_step += 1
                     self.state.epoch = epoch + (step + 1) / steps_in_epoch
                     self.control = self.callback_handler.on_step_end(self.args, self.state, self.control)
-                    #self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
+
+                    self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
                 if self.control.should_epoch_stop or self.control.should_training_stop:
                     break
@@ -860,11 +862,12 @@ class Trainer:
             )
             self._logging_loss_scalar = tr_loss_scalar
             self._globalstep_last_logged = self.state.global_step
+
             self.log(logs)
 
         metrics = None
         if self.control.should_evaluate:
-            metrics = self.evaluate()
+            metrics = self.evaluate(epoch)
             self._report_to_hp_search(trial, epoch, metrics)
 
         if self.control.should_save:
