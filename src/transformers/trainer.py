@@ -224,6 +224,7 @@ class Trainer:
         data_collator: Optional[DataCollator] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
+        test_dataset: Optional[Dataset] = None,
         tokenizer: Optional["PreTrainedTokenizerBase"] = None,
         model_init: Callable[[], PreTrainedModel] = None,
         compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
@@ -249,6 +250,7 @@ class Trainer:
         self.data_collator = data_collator if data_collator is not None else default_collator
         self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
+        self.test_dataset = test_dataset
         self.tokenizer = tokenizer
 
         self.compute_metrics = compute_metrics
@@ -860,12 +862,14 @@ class Trainer:
             )
             self._logging_loss_scalar = tr_loss_scalar
             self._globalstep_last_logged = self.state.global_step
+
             self.log(logs)
 
         metrics = None
         if self.control.should_evaluate:
-            metrics = self.evaluate()
-            self._report_to_hp_search(trial, epoch, metrics)
+            eval_metrics = self.evaluate(epoch, self.args.eval_dataset)
+            self._report_to_hp_search(trial, epoch, eval_metrics)
+            test_metrics = self.evaluate(epoch, self.args.test_dataset)
 
         if self.control.should_save:
             self._save_checkpoint(model, trial, metrics=metrics)
@@ -1279,7 +1283,7 @@ class Trainer:
             logger.info("Deleting older checkpoint [{}] due to args.save_total_limit".format(checkpoint))
             shutil.rmtree(checkpoint)
 
-    def evaluate(self, eval_dataset: Optional[Dataset] = None) -> Dict[str, float]:
+    def evaluate(self, epoch, eval_dataset: Optional[Dataset] = None) -> Dict[str, float]:
         """
         Run evaluation and returns metrics.
 
@@ -1309,6 +1313,7 @@ class Trainer:
             # self.args.prediction_loss_only
             prediction_loss_only=True if self.compute_metrics is None else None,
         )
+        output.metrics['epoch'] = epoch
 
         self.log(output.metrics)
 
