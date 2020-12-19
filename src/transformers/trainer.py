@@ -590,6 +590,19 @@ class Trainer:
 
         return model
 
+    def unfreeze_layer(self, model, layer_id):
+       roberta_params = [x for x in model.roberta.children()]
+       layers = [x for x in roberta_params[1].children()][0]
+       assert layer_id >= -1 and layer_id <= 5
+       if layer_id >= 0:
+          for param in layers[2*layer_id + 1].parameters():
+              param.requires_grad = True 
+          for param in layers[2*layer_id].parameters():
+              param.requires_grad = True
+       else:
+          for param in roberta_params[0].parameters():
+              param.requires_grad = True 
+
     def train(self, model_path: Optional[str] = None, trial: Union["optuna.Trial", Dict[str, Any]] = None):
         """
         Main training entry point.
@@ -738,6 +751,8 @@ class Trainer:
         self.control = self.callback_handler.on_train_begin(self.args, self.state, self.control)
 
         for epoch in range(epochs_trained, num_train_epochs):
+            if self.args.gradual_unfreeze == True and epoch < 7:
+               self.unfreeze_layer(self.model, 5 - epoch)
             if isinstance(train_dataloader, DataLoader) and isinstance(train_dataloader.sampler, DistributedSampler):
                 train_dataloader.sampler.set_epoch(epoch)
 
@@ -803,7 +818,7 @@ class Trainer:
                     self.state.global_step += 1
                     self.state.epoch = epoch + (step + 1) / steps_in_epoch
                     self.control = self.callback_handler.on_step_end(self.args, self.state, self.control)
-                    #self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
+                    self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
                 if self.control.should_epoch_stop or self.control.should_training_stop:
                     break
@@ -867,9 +882,9 @@ class Trainer:
 
         metrics = None
         if self.control.should_evaluate:
-            eval_metrics = self.evaluate(epoch, self.args.eval_dataset)
+            eval_metrics = self.evaluate(self.eval_dataset, epoch, tr_loss, "eval", model)
             self._report_to_hp_search(trial, epoch, eval_metrics)
-            test_metrics = self.evaluate(epoch, self.args.test_dataset)
+            self.evaluate_metric(self.test_dataset, epoch, tr_loss, "test")
 
         if self.control.should_save:
             self._save_checkpoint(model, trial, metrics=metrics)
@@ -1283,7 +1298,38 @@ class Trainer:
             logger.info("Deleting older checkpoint [{}] due to args.save_total_limit".format(checkpoint))
             shutil.rmtree(checkpoint)
 
-    def evaluate(self, epoch, eval_dataset: Optional[Dataset] = None) -> Dict[str, float]:
+    def evaluate_metric(self, eval_dataset, epoch=None, tr_loss=None, eval_type = None) -> Dict[str, float]:
+        """
+        Minimum evaluation, i.e., compute metrics only, without changing self.control
+        """
+        eval_dataloader = self.get_eval_dataloader(eval_dataset)
+
+        output = self.prediction_loop(
+            eval_dataloader,
+            description="Evaluation",
+            # No point gathering the predictions if there are no metrics, otherwise we defer to
+            # self.args.prediction_loss_only
+            prediction_loss_only=True if self.compute_metrics is None else None,
+        )
+        output.metrics["eval_type"] = eval_type
+        if epoch:
+            output.metrics['epoch'] = epoch
+        if tr_loss:
+            tr_loss_scalar = tr_loss.item()
+            output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
+                    self.state.global_step - self._globalstep_last_logged
+            )
+        if self.lr_scheduler:
+            output.metrics['learning_rate'] = (
+                self.lr_scheduler.get_last_lr()[0]
+                if version.parse(torch.__version__) >= version.parse("1.4")
+                else self.lr_scheduler.get_lr()[0]
+            )
+        self.log(output.metrics)
+
+        return output.metrics
+
+    def evaluate(self, eval_dataset: Optional[Dataset] = None, epoch = None, tr_loss = None, eval_type=None, model=None) -> Dict[str, float]:
         """
         Run evaluation and returns metrics.
 
@@ -1313,7 +1359,20 @@ class Trainer:
             # self.args.prediction_loss_only
             prediction_loss_only=True if self.compute_metrics is None else None,
         )
-        output.metrics['epoch'] = epoch
+        output.metrics["eval_type"] = eval_type
+        if epoch:
+            output.metrics['epoch'] = epoch
+        if tr_loss:
+            tr_loss_scalar = tr_loss.item()
+            output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
+                    self.state.global_step - self._globalstep_last_logged
+            )
+        if self.lr_scheduler:
+            output.metrics['learning_rate'] = (
+                self.lr_scheduler.get_last_lr()[0]
+                if version.parse(torch.__version__) >= version.parse("1.4")
+                else self.lr_scheduler.get_lr()[0]
+            )
 
         self.log(output.metrics)
 

@@ -182,6 +182,8 @@ class TrainingArguments:
             - :obj:`False` if :obj:`metric_for_best_model` is not set, or set to :obj:`"loss"` or :obj:`"eval_loss"`.
     """
 
+    """ the following parameters are defined by myself """
+
     output_dir: str = field(
         metadata={"help": "The output directory where the model predictions and checkpoints will be written."}
     )
@@ -194,10 +196,10 @@ class TrainingArguments:
             )
         },
     )
-
     do_train: bool = field(default=False, metadata={"help": "Whether to run training."})
     do_eval: bool = field(default=None, metadata={"help": "Whether to run eval on the dev set."})
     do_predict: bool = field(default=False, metadata={"help": "Whether to run predictions on the test set."})
+    gradual_unfreeze: bool = field(default=False, metadata={"help": "Whether to gradually unfreeze layers."})
     evaluate_during_training: bool = field(
         default=False,
         metadata={"help": "Run evaluation during training at each logging step."},
@@ -254,6 +256,7 @@ class TrainingArguments:
         default=-1,
         metadata={"help": "If > 0: set total number of training steps to perform. Override num_train_epochs."},
     )
+    warmup_ratio: float = field(default=0.0, metadata={"help": "Linear warmup ratio"})
     warmup_steps: int = field(default=0, metadata={"help": "Linear warmup over warmup_steps."})
 
     logging_dir: Optional[str] = field(default_factory=default_logdir, metadata={"help": "Tensorboard log dir."})
@@ -453,7 +456,7 @@ class TrainingArguments:
         """
         Serializes this instance to a JSON string.
         """
-        return json.dumps(self.to_dict(), indent=2)
+        return json.dumps(str(self.to_dict()), indent=2)
 
     def to_sanitized_dict(self) -> Dict[str, Any]:
         """
