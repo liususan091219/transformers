@@ -1,0 +1,325 @@
+wandb_version: 1
+
+_name_or_path:
+  desc: null
+  value: ../../../data/bert-base-cased
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.10.9
+    framework: torch
+    huggingface_version: 3.4.0
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.7.9
+adam_beta1:
+  desc: null
+  value: 0.9
+adam_beta2:
+  desc: null
+  value: 0.999
+adam_epsilon:
+  desc: null
+  value: 1.0e-08
+add_cross_attention:
+  desc: null
+  value: false
+architectures:
+  desc: null
+  value:
+  - BertForMaskedLM
+attention_probs_dropout_prob:
+  desc: null
+  value: 0.1
+bad_words_ids:
+  desc: null
+  value: null
+bos_token_id:
+  desc: null
+  value: null
+chunk_size_feed_forward:
+  desc: null
+  value: 0
+dataloader_drop_last:
+  desc: null
+  value: false
+dataloader_num_workers:
+  desc: null
+  value: 0
+debug:
+  desc: null
+  value: false
+decoder_start_token_id:
+  desc: null
+  value: null
+disable_tqdm:
+  desc: null
+  value: false
+do_eval:
+  desc: null
+  value: true
+do_predict:
+  desc: null
+  value: true
+do_sample:
+  desc: null
+  value: false
+do_train:
+  desc: null
+  value: true
+early_stopping:
+  desc: null
+  value: false
+eos_token_id:
+  desc: null
+  value: null
+eval_accumulation_steps:
+  desc: null
+  value: None
+eval_batch_size:
+  desc: null
+  value: 8
+eval_steps:
+  desc: null
+  value: 500
+evaluate_during_training:
+  desc: null
+  value: true
+evaluation_strategy:
+  desc: null
+  value: steps
+finetuning_task:
+  desc: null
+  value: rte
+fp16:
+  desc: null
+  value: false
+fp16_opt_level:
+  desc: null
+  value: O1
+gradient_accumulation_steps:
+  desc: null
+  value: 1
+gradient_checkpointing:
+  desc: null
+  value: false
+greater_is_better:
+  desc: null
+  value: None
+hidden_act:
+  desc: null
+  value: gelu
+hidden_dropout_prob:
+  desc: null
+  value: 0.1
+hidden_size:
+  desc: null
+  value: 768
+id2label:
+  desc: null
+  value:
+    '0': LABEL_0
+    '1': LABEL_1
+initializer_range:
+  desc: null
+  value: 0.02
+intermediate_size:
+  desc: null
+  value: 3072
+is_decoder:
+  desc: null
+  value: false
+is_encoder_decoder:
+  desc: null
+  value: false
+label2id:
+  desc: null
+  value:
+    LABEL_0: 0
+    LABEL_1: 1
+label_names:
+  desc: null
+  value: None
+layer_norm_eps:
+  desc: null
+  value: 1.0e-12
+learning_rate:
+  desc: null
+  value: 2.0e-05
+length_penalty:
+  desc: null
+  value: 1.0
+load_best_model_at_end:
+  desc: null
+  value: false
+local_rank:
+  desc: null
+  value: -1
+logging_dir:
+  desc: null
+  value: runs/Nov08_09-05-30_tmdev
+logging_first_step:
+  desc: null
+  value: false
+logging_steps:
+  desc: null
+  value: 500
+max_grad_norm:
+  desc: null
+  value: 1.0
+max_length:
+  desc: null
+  value: 20
+max_position_embeddings:
+  desc: null
+  value: 512
+max_steps:
+  desc: null
+  value: -1
+metric_for_best_model:
+  desc: null
+  value: None
+min_length:
+  desc: null
+  value: 0
+model_type:
+  desc: null
+  value: bert
+no_cuda:
+  desc: null
+  value: false
+no_repeat_ngram_size:
+  desc: null
+  value: 0
+num_attention_heads:
+  desc: null
+  value: 12
+num_beams:
+  desc: null
+  value: 1
+num_hidden_layers:
+  desc: null
+  value: 12
+num_return_sequences:
+  desc: null
+  value: 1
+num_train_epochs:
+  desc: null
+  value: 3.0
+output_attentions:
+  desc: null
+  value: false
+output_dir:
+  desc: null
+  value: ./tmp/RTE/
+output_hidden_states:
+  desc: null
+  value: false
+overwrite_output_dir:
+  desc: null
+  value: true
+pad_token_id:
+  desc: null
+  value: 0
+past_index:
+  desc: null
+  value: -1
+per_device_eval_batch_size:
+  desc: null
+  value: 8
+per_device_train_batch_size:
+  desc: null
+  value: 8
+per_gpu_eval_batch_size:
+  desc: null
+  value: None
+per_gpu_train_batch_size:
+  desc: null
+  value: 32
+prediction_loss_only:
+  desc: null
+  value: false
+prefix:
+  desc: null
+  value: null
+pruned_heads:
+  desc: null
+  value: {}
+remove_unused_columns:
+  desc: null
+  value: true
+repetition_penalty:
+  desc: null
+  value: 1.0
+return_dict:
+  desc: null
+  value: false
+run_name:
+  desc: null
+  value: ./tmp/RTE/
+save_steps:
+  desc: null
+  value: 500
+save_total_limit:
+  desc: null
+  value: None
+seed:
+  desc: null
+  value: 42
+sep_token_id:
+  desc: null
+  value: null
+task_specific_params:
+  desc: null
+  value: null
+temperature:
+  desc: null
+  value: 1.0
+tie_encoder_decoder:
+  desc: null
+  value: false
+tie_word_embeddings:
+  desc: null
+  value: true
+tokenizer_class:
+  desc: null
+  value: null
+top_k:
+  desc: null
+  value: 50
+top_p:
+  desc: null
+  value: 1.0
+torchscript:
+  desc: null
+  value: false
+tpu_metrics_debug:
+  desc: null
+  value: false
+tpu_num_cores:
+  desc: null
+  value: None
+train_batch_size:
+  desc: null
+  value: 32
+type_vocab_size:
+  desc: null
+  value: 2
+use_bfloat16:
+  desc: null
+  value: false
+use_cache:
+  desc: null
+  value: true
+vocab_size:
+  desc: null
+  value: 28996
+warmup_steps:
+  desc: null
+  value: 0
+weight_decay:
+  desc: null
+  value: 0.0
+xla_device:
+  desc: null
+  value: null
