@@ -258,6 +258,8 @@ class TrainingArguments:
     )
     warmup_ratio: float = field(default=0.0, metadata={"help": "Linear warmup ratio"})
     warmup_steps: int = field(default=0, metadata={"help": "Linear warmup over warmup_steps."})
+    hidden_dropout_prob: float = field(default=0.1, metadata={"help": "dropout ratio"})
+    attention_probs_dropout_prob: float = field(default = 0.1, metadata={"help": "dropout ratio"})
 
     logging_dir: Optional[str] = field(default_factory=default_logdir, metadata={"help": "Tensorboard log dir."})
     logging_first_step: bool = field(default=False, metadata={"help": "Log the first global_step"})

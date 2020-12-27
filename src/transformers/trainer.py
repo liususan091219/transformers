@@ -824,7 +824,7 @@ class Trainer:
                     break
 
             self.control = self.callback_handler.on_epoch_end(self.args, self.state, self.control)
-            self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
+            #self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
             if self.args.tpu_metrics_debug or self.args.debug:
                 if is_torch_tpu_available():
@@ -1077,7 +1077,7 @@ class Trainer:
             logs["epoch"] = self.state.epoch
 
         self.control = self.callback_handler.on_log(self.args, self.state, self.control, logs)
-        output = {**logs, **{"step": self.state.global_step}}
+        output = {**logs, **{"step": self.state.global_step, "epoch": self.state.epoch}}
         self.state.log_history.append(output)
 
     def _prepare_inputs(self, inputs: Dict[str, Union[torch.Tensor, Any]]) -> Dict[str, Union[torch.Tensor, Any]]:
@@ -1316,9 +1316,12 @@ class Trainer:
             output.metrics['epoch'] = epoch
         if tr_loss:
             tr_loss_scalar = tr_loss.item()
-            output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
+            try:
+                 output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
                     self.state.global_step - self._globalstep_last_logged
             )
+            except:
+                 output.metrics['loss'] = 0.0
         if self.lr_scheduler:
             output.metrics['learning_rate'] = (
                 self.lr_scheduler.get_last_lr()[0]
@@ -1364,9 +1367,12 @@ class Trainer:
             output.metrics['epoch'] = epoch
         if tr_loss:
             tr_loss_scalar = tr_loss.item()
-            output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
+            try:
+                output.metrics['loss'] = (tr_loss_scalar - self._logging_loss_scalar) / (
                     self.state.global_step - self._globalstep_last_logged
             )
+            except:
+                output.metrics['loss'] = 0
         if self.lr_scheduler:
             output.metrics['learning_rate'] = (
                 self.lr_scheduler.get_last_lr()[0]
