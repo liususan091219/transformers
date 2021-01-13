@@ -94,6 +94,7 @@ class DebertaConfig(PretrainedConfig):
         intermediate_size=3072,
         hidden_act="gelu",
         hidden_dropout_prob=0.1,
+        cls_dropout=0.1,
         attention_probs_dropout_prob=0.1,
         max_position_embeddings=512,
         type_vocab_size=0,
@@ -116,6 +117,7 @@ class DebertaConfig(PretrainedConfig):
         self.intermediate_size = intermediate_size
         self.hidden_act = hidden_act
         self.hidden_dropout_prob = hidden_dropout_prob
+        self.cls_dropout = cls_dropout
         self.attention_probs_dropout_prob = attention_probs_dropout_prob
         self.max_position_embeddings = max_position_embeddings
         self.type_vocab_size = type_vocab_size
