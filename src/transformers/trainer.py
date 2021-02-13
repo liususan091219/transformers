@@ -1298,11 +1298,11 @@ class Trainer:
             logger.info("Deleting older checkpoint [{}] due to args.save_total_limit".format(checkpoint))
             shutil.rmtree(checkpoint)
 
-    def evaluate_metric(self, eval_dataset, epoch=None, tr_loss=None, eval_type = None) -> Dict[str, float]:
+    def evaluate_metric(self, this_dataset, epoch=None, tr_loss=None, eval_type = None) -> Dict[str, float]:
         """
         Minimum evaluation, i.e., compute metrics only, without changing self.control
         """
-        eval_dataloader = self.get_eval_dataloader(eval_dataset)
+        eval_dataloader = self.get_eval_dataloader(this_dataset)
 
         output = self.prediction_loop(
             eval_dataloader,
