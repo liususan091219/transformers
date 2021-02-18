@@ -257,12 +257,15 @@ class TrainingArguments:
         metadata={"help": "If > 0: set total number of training steps to perform. Override num_train_epochs."},
     )
     warmup_ratio: float = field(default=0.0, metadata={"help": "Linear warmup ratio"})
+    trial_id: int = field(default=-1, metadata={"help": "trial id"})
     warmup_steps: int = field(default=0, metadata={"help": "Linear warmup over warmup_steps."})
     cls_dropout: float = field(default=0.1, metadata={"help": "cls dropout ratio"})
     hidden_dropout_prob: float = field(default=0.1, metadata={"help": "dropout ratio"})
     attention_probs_dropout_prob: float = field(default = 0.1, metadata={"help": "dropout ratio"})
 
     logging_dir: Optional[str] = field(default_factory=default_logdir, metadata={"help": "Tensorboard log dir."})
+    result_dir: str = field(default="", metadata={"help": "result directory"})
+
     logging_first_step: bool = field(default=False, metadata={"help": "Log the first global_step"})
     logging_steps: int = field(default=500, metadata={"help": "Log every X updates steps."})
     save_steps: int = field(default=500, metadata={"help": "Save checkpoint every X updates steps."})
