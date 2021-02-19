@@ -258,6 +258,7 @@ class TrainingArguments:
     )
     warmup_ratio: float = field(default=0.0, metadata={"help": "Linear warmup ratio"})
     trial_id: int = field(default=-1, metadata={"help": "trial id"})
+    submit_mode: str = field(default="compare", metadata={"help": "submit or compare mode"})
     warmup_steps: int = field(default=0, metadata={"help": "Linear warmup over warmup_steps."})
     cls_dropout: float = field(default=0.1, metadata={"help": "cls dropout ratio"})
     hidden_dropout_prob: float = field(default=0.1, metadata={"help": "dropout ratio"})

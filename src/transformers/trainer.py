@@ -884,7 +884,7 @@ class Trainer:
         if self.control.should_evaluate:
             eval_metrics = self.evaluate(self.eval_dataset, epoch, tr_loss, "eval", model)
             self._report_to_hp_search(trial, epoch, eval_metrics)
-            self.evaluate_metric(self.test_dataset, epoch, tr_loss, "test")
+            #self.evaluate_metric(self.test_dataset, epoch, tr_loss, "test")
 
         if self.control.should_save:
             self._save_checkpoint(model, trial, metrics=metrics)
