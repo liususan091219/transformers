@@ -5,6 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
+from ray.tune.function_runner import StatusReporter
 
 from .file_utils import cached_property, is_torch_available, is_torch_tpu_available, torch_required
 from .trainer_utils import EvaluationStrategy
@@ -256,7 +257,9 @@ class TrainingArguments:
         default=-1,
         metadata={"help": "If > 0: set total number of training steps to perform. Override num_train_epochs."},
     )
+    is_grid: bool = field(default=False, metadata={"help": "whether this trial is a part of grid search"}) 
     warmup_ratio: float = field(default=0.0, metadata={"help": "Linear warmup ratio"})
+    eval_acc_name: str = field(default="", metadata={"help": "evaluate acc name"})
     trial_id: int = field(default=-1, metadata={"help": "trial id"})
     submit_mode: str = field(default="compare", metadata={"help": "submit or compare mode"})
     warmup_steps: int = field(default=0, metadata={"help": "Linear warmup over warmup_steps."})
