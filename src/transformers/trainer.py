@@ -16,6 +16,7 @@
 The Trainer class, to easily train a 🤗 Transformers from scratch or finetune it on a new task.
 """
 
+import torch.nn.functional as F
 import collections
 import inspect
 import math
@@ -1304,7 +1305,7 @@ class Trainer:
         """
         eval_dataloader = self.get_eval_dataloader(this_dataset)
 
-        output = self.prediction_loop(
+        output, predicted_results, label_ids = self.prediction_loop(
             eval_dataloader,
             description="Evaluation",
             # No point gathering the predictions if there are no metrics, otherwise we defer to
@@ -1355,7 +1356,7 @@ class Trainer:
 
         eval_dataloader = self.get_eval_dataloader(eval_dataset)
 
-        output = self.prediction_loop(
+        output, predicted_results, label_ids = self.prediction_loop(
             eval_dataloader,
             description="Evaluation",
             # No point gathering the predictions if there are no metrics, otherwise we defer to
@@ -1419,7 +1420,8 @@ class Trainer:
 
         test_dataloader = self.get_test_dataloader(test_dataset)
 
-        return self.prediction_loop(test_dataloader, description="Prediction")
+        output, predicted_results, label_ids = self.prediction_loop(test_dataloader, description="Prediction")
+        return output
 
     def prediction_loop(
         self, dataloader: DataLoader, description: str, prediction_loss_only: Optional[bool] = None
@@ -1434,7 +1436,7 @@ class Trainer:
                 "The `_prediction_loop` method is deprecated and won't be called in a future version, define `prediction_loop` in your subclass.",
                 FutureWarning,
             )
-            return self._prediction_loop(dataloader, description, prediction_loss_only=prediction_loss_only)
+            return self._prediction_loop(dataloader, description, prediction_loss_only=prediction_loss_only), None, None
 
         if not isinstance(dataloader.dataset, collections.abc.Sized):
             raise ValueError("dataset must implement __len__")
@@ -1516,8 +1518,10 @@ class Trainer:
         label_ids = labels_gatherer.finalize() if not prediction_loss_only else None
 
         if self.compute_metrics is not None and preds is not None and label_ids is not None:
-            metrics = self.compute_metrics(EvalPrediction(predictions=preds, label_ids=label_ids))
+            predicted_results = EvalPrediction(predictions=preds, label_ids=label_ids)
+            metrics = self.compute_metrics(predicted_results)
         else:
+            predicted_results = None
             metrics = {}
 
         if eval_loss is not None:
@@ -1528,7 +1532,7 @@ class Trainer:
             if not key.startswith("eval_"):
                 metrics[f"eval_{key}"] = metrics.pop(key)
 
-        return PredictionOutput(predictions=preds, label_ids=label_ids, metrics=metrics)
+        return PredictionOutput(predictions=preds, label_ids=label_ids, metrics=metrics), predicted_results, label_ids
 
     def _gather_and_numpify(self, tensors, name):
         """
